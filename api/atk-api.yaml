@@ -7,81 +7,10 @@ info:
 servers:
   - url: http://localhost:8080/v1
 paths:
-  /estimator/status/summary:
-    get:
-      summary: Return the current status computed from all estimators
-      operationId: status
-      tags:
-        - estimator
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EstimatorSummary"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /estimator/status/details:
-    get:
-      summary: Detailed status of all estimators
-      operationId: statusDetails
-      tags:
-        - estimator
-      parameters:
-        - name: Id
-          in: path
-          required: true
-          description: The id of the estimator to retrieve
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EstimatorDetailList"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /estimator/status/details/{Id}:
-    get:
-      summary: Detailed state for a specific estimator
-      operationId: statusDetailsById
-      tags:
-        - estimator
-      parameters:
-        - name: Id
-          in: path
-          required: true
-          description: The id of the estimator to retrieve
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EstimatorDetail"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
   /estimator/params:
     get:
       summary: Get the ARIMA parameters used by the estimators
-      operationId: getEstimatorParams
+      operationId: get estimator parameters
       tags:
         - estimator
       responses:
@@ -90,7 +19,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EstimatorDetail"
+                $ref: "#/components/schemas/ArimaParameters"
+              example:
+                P: 5
+                D: 1
+                Q: 0
         default:
           description: unexpected error
           content:
@@ -99,7 +32,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     put:
       summary: Update the ARIMA parameters used by the estimators
-      operationId: putEstimatorParams
+      operationId: update estimator parameters
       tags:
         - estimator
       requestBody:
@@ -109,13 +42,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ArimaParameters'
+            example:
+                P: 1
+                D: 0
+                Q: 12
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EstimatorDetail"
         default:
           description: unexpected error
           content:
@@ -125,7 +58,7 @@ paths:
   /estimator/threads:
     get:
       summary: Get the number of threads used by ARIMA estimators
-      operationId: getEstimatorThreads
+      operationId: get estimator threads
       tags:
         - estimator
       responses:
@@ -136,6 +69,10 @@ paths:
               schema:
                 type: integer
                 format: int32
+                minimum: 1
+                maximum: 1024
+              example:
+                threads: 8
         default:
           description: unexpected error
           content:
@@ -144,7 +81,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     put:
       summary: Update the number of threads used by ARIMA estimators
-      operationId: putEstimatorThreads
+      operationId: update estimator threads
       tags:
         - estimator
       requestBody:
@@ -155,6 +92,10 @@ paths:
             schema:
               type: integer
               format: int32
+              minimum: 1
+              maximum: 1024
+              example:
+                threads: 12
       responses:
         '200':
           description: Expected response to a valid request
@@ -171,7 +112,7 @@ paths:
   /nodes:
     get:
       summary: Return list of nodes currently managed
-      operationId: getNodes
+      operationId: get all nodes
       tags:
         - nodes
       responses:
@@ -180,16 +121,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeList"
+                $ref: "#/components/schemas/NodeStatusList"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
+                $ref: "#/components/schemas/Error"
     post:
       summary: Manage a new node
-      operationId: postNode
+      operationId: manage new node
       tags:
         - nodes
       requestBody:
@@ -198,24 +139,81 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Node'
+              $ref: '#/components/schemas/NodeConfig'
+            example:
+              node-id: "VNF-x"
+              tracked: true
+              use-case:
+                - "UC-y"
+                - "UC-z"
+              tags:
+                - pce
+                - sdd
+      responses:
+        '200':
+          description: Expected response to a valid request
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Remove all nodes from the list of managed nodes
+      operationId: delete all use ndoes
+      tags:
+        - nodes
+      responses:
+        '200':
+          description: Expected response to a valid request
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /nodes/status:
+    get:
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/Status'
+          required: true
+      summary: Get list of nodes having the given status 
+      operationId: filter nodes by status
+      tags:
+        - nodes
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeList"
+                $ref: "#/components/schemas/NodeStatusList"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
+                $ref: "#/components/schemas/Error"
+  /nodes/summarizedstatus:
+    get:
+      summary: Return the worst status across all nodes and use-cases
+      operationId: get summarized status
+      tags:
+        - nodes
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodesSummarizedStatus"
   /nodes/{Id}:
     get:
       summary: Detailed information for a specific node
-      operationId: getNodeById
+      operationId: get node by id
       tags:
         - nodes
       parameters:
@@ -231,7 +229,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Node"
+                $ref: "#/components/schemas/NodeStatus"
         default:
           description: unexpected error
           content:
@@ -240,7 +238,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     put:
       summary: Update information for a specific node {Id}
-      operationId: putNodeById
+      operationId: update node by id
       tags:
         - nodes
       parameters:
@@ -256,14 +254,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Node'
+              $ref: '#/components/schemas/NodeConfig'
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Node"
         default:
           description: unexpected error
           content:
@@ -272,7 +266,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Remove node {id} from the managed nodes
-      operationId: deleteNodeById
+      operationId: delete node by id
       tags:
         - nodes
       parameters:
@@ -285,10 +279,6 @@ paths:
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Node"
         default:
           description: unexpected error
           content:
@@ -298,7 +288,7 @@ paths:
   /nodes/{Id}/ignore:
     post:
       summary: If set to true, keep node {id} tracked but do not consider for the estimation.
-      operationId: postNodeIgnore
+      operationId: ignore a node
       tags:
         - nodes
       parameters:
@@ -318,10 +308,6 @@ paths:
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NodeList"
         default:
           description: unexpected error
           content:
@@ -331,7 +317,7 @@ paths:
   /use-cases:
     get:
       summary: Return list of use-cases currently managed
-      operationId: getUsecases
+      operationId: get all use-cases
       tags:
         - use-cases
       responses:
@@ -340,7 +326,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeList"
+                $ref: "#/components/schemas/UseCaseList"
         default:
           description: unexpected error
           content:
@@ -349,7 +335,7 @@ paths:
                 $ref: "#/components/schemas/Error"              
     post:
       summary: Manage a new use-case
-      operationId: postUseCase
+      operationId: manage a new use-case
       tags:
         - use-cases
       requestBody:
@@ -358,24 +344,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Node'
+              $ref: '#/components/schemas/UseCase'
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeList"
+                $ref: "#/components/schemas/UseCase"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"              
+    delete:
+      summary: Remove all use-cases from the managed use-cases
+      operationId: delete all use cases
+      tags:
+        - use-cases
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UseCase"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /use-cases/{Id}:
     get:
       summary: Detailed information for a specific use-case
-      operationId: getUseCaseById
+      operationId: get use-case by id
       tags:
         - use-cases
       parameters:
@@ -391,7 +395,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Node"
+                $ref: "#/components/schemas/UseCase"
         default:
           description: unexpected error
           content:
@@ -400,7 +404,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     put:
       summary: Update information for a specific use-case {Id}
-      operationId: putUseCase
+      operationId: update use-case
       tags:
         - use-cases
       parameters:
@@ -416,14 +420,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Node'
+              $ref: '#/components/schemas/UseCase'
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Node"
+                $ref: "#/components/schemas/UseCase"
         default:
           description: unexpected error
           content:
@@ -432,7 +436,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Remove use-case {id} from the managed use-cases
-      operationId: deleteUseCaseById
+      operationId: delete use case
       tags:
         - use-cases
       parameters:
@@ -448,7 +452,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Node"
+                $ref: "#/components/schemas/UseCase"
         default:
           description: unexpected error
           content:
@@ -457,8 +461,8 @@ paths:
                 $ref: "#/components/schemas/Error"
   /history:
     get:
-      summary: Return history of all nodes currently managed
-      operationId: getHistory
+      summary: Return history for all use-case currently managed
+      operationId: get history
       tags:
         - history
       responses:
@@ -476,15 +480,15 @@ paths:
                 $ref: "#/components/schemas/Error"              
   /history/{Id}:
     get:
-      summary: Return history for the given node Id
-      operationId: getHistoryById
+      summary: Return history for the given use-case Id
+      operationId: get history by id
       tags:
         - history
       parameters:
         - name: Id
           in: path
           required: true
-          description: The id of the node to retrieve
+          description: The id of the use-case to retrieve
           schema:
             type: string
       responses:
@@ -493,7 +497,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Node"
+                type: "string"
         default:
           description: unexpected error
           content:
@@ -502,8 +506,8 @@ paths:
                 $ref: "#/components/schemas/Error"
   /history/realign:
     post:
-      summary: Reread history from input data, adapt and store them in local history for all nodes
-      operationId: postHistoryRealign
+      summary: Reread history from input data, adapt and store them in local history for all use-cases
+      operationId: realign history for all use-cases
       tags:
         - history
       responses:
@@ -520,25 +524,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"              
   /history/realign/{Id}:
-    get:
-      summary: Reread history from input data, adapt and store them in local history for a given node Id
-      operationId: postHistoryRealignById
+    post:
+      summary: Reread history from input data, adapt and store them in local history for a given use-case Id
+      operationId: realign history for use-case id
       tags:
         - history
       parameters:
         - name: Id
           in: path
           required: true
-          description: The Id of the node to realign history
+          description: The Id of the use-case to realign history
           schema:
             type: string
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Node"
         default:
           description: unexpected error
           content:
@@ -548,7 +548,7 @@ paths:
   /history/ts-min:
     get:
       summary: Return minimum number of timeslots to populate local history
-      operationId: getTsMin
+      operationId: get minimum timeslots
       tags:
         - history
       responses:
@@ -568,7 +568,7 @@ paths:
   /history/ts-max:
     get:
       summary: Return maximum number of timeslots to populate local history
-      operationId: getTsMax
+      operationId: get maximum timeslots
       tags:
         - history
       responses:
@@ -588,7 +588,7 @@ paths:
   /history/autorefresh:
     get:
       summary: Return the time interval between consecutive data captures
-      operationId: getAutorefresh
+      operationId: get autorefresh
       tags:
         - history
       responses:
@@ -608,7 +608,7 @@ paths:
   /version:
     get:
       summary: Return the ATk software version
-      operationId: getVersion
+      operationId: get version
       tags:
         - version
       responses:
@@ -632,15 +632,36 @@ components:
           type: string
         tag:
           type: string
-    EstimatorDetailList:
+    NodeStatusList:
       type: array
       items:
-        $ref: '#/components/schemas/EstimatorDetail'
-    NodeList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Node'
-    Node:
+        $ref: '#/components/schemas/NodeStatus'
+    NodeStatus:
+      type: object
+      required:
+        - node-id
+      properties:
+        node-id:
+          type: string
+        timeslot:
+          type: integer
+          format: int32
+        tags:
+          type: array
+          items:
+            type: string
+        tracked:
+          type: boolean
+        use-case:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                $ref: '#/components/schemas/Status'
+    NodeConfig:
       type: object
       required:
         - node-id
@@ -654,7 +675,9 @@ components:
         tracked:
           type: boolean
         use-case:
-          type: string
+          type: array
+          items:
+            type: string      
     UseCaseList:
       type: array
       items:
@@ -691,15 +714,14 @@ components:
               format: int32
             hysteresis:
               type: string
-    EstimatorSummary:
+    NodesSummarizedStatus:
       type: object
       properties:
         timeslot:
           type: "integer"
           format: int64
         status:
-          type: "string"
-          enum: [BaU, Warn, Alarm, Undefined]
+          $ref: "#/components/schemas/Status"
     ArimaParameters:
       type: object
       properties:
@@ -712,6 +734,9 @@ components:
         Q:
           type: "integer"
           format: int64
+    Status:
+      type: "string"
+      enum: [BaU, Warn, Alarm, Undefined]
     Error:
       type: object
       required:
@@ -723,3 +748,6 @@ components:
           format: int32
         message:
           type: string
+      example:
+        code: "500"
+        message: "Internal application error" 

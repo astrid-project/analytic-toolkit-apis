@@ -1,3 +1,5 @@
+<!-- Generator: Widdershins v4.0.0 -->
+
 <h1 id="analytic-toolkit-rest-api">Analytic Toolkit REST API v1.0.0</h1>
 
 > Scroll down for example requests and responses.
@@ -10,115 +12,9 @@ Base URLs:
 
 <h1 id="analytic-toolkit-rest-api-estimator">estimator</h1>
 
-## get status
+## get estimator parameters
 
-<a id="opIdget status"></a>
-
-`GET /estimator/status/summary`
-
-*Return the current status computed from all estimators*
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "timeslot": 0,
-  "status": "BaU"
-}
-```
-
-<h3 id="get-status-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[EstimatorSummary](#schemaestimatorsummary)|
-|default|Default|unexpected error|[Error](#schemaerror)|
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## get all status details
-
-<a id="opIdget all status details"></a>
-
-`GET /estimator/status/details`
-
-*Detailed status of all estimators*
-
-<h3 id="get-all-status-details-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|Id|path|string|true|The id of the estimator to retrieve|
-
-> Example responses
-
-> 200 Response
-
-```json
-[
-  {
-    "id": 0,
-    "name": "string",
-    "tag": "string"
-  }
-]
-```
-
-<h3 id="get-all-status-details-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[EstimatorDetailList](#schemaestimatordetaillist)|
-|default|Default|unexpected error|[Error](#schemaerror)|
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## get status details by id
-
-<a id="opIdget status details by id"></a>
-
-`GET /estimator/status/details/{Id}`
-
-*Detailed state for a specific estimator*
-
-<h3 id="get-status-details-by-id-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|Id|path|string|true|The id of the estimator to retrieve|
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "id": 0,
-  "name": "string",
-  "tag": "string"
-}
-```
-
-<h3 id="get-status-details-by-id-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[EstimatorDetail](#schemaestimatordetail)|
-|default|Default|unexpected error|[Error](#schemaerror)|
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## get estimator paramaters
-
-<a id="opIdget estimator paramaters"></a>
+<a id="opIdget estimator parameters"></a>
 
 `GET /estimator/params`
 
@@ -130,17 +26,26 @@ This operation does not require authentication
 
 ```json
 {
-  "id": 0,
-  "name": "string",
-  "tag": "string"
+  "P": 5,
+  "D": 1,
+  "Q": 0
 }
 ```
 
-<h3 id="get-estimator-paramaters-responses">Responses</h3>
+> default Response
+
+```json
+{
+  "code": "500",
+  "message": "Internal application error"
+}
+```
+
+<h3 id="get-estimator-parameters-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[EstimatorDetail](#schemaestimatordetail)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[ArimaParameters](#schemaarimaparameters)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -173,13 +78,12 @@ This operation does not require authentication
 
 > Example responses
 
-> 200 Response
+> default Response
 
 ```json
 {
-  "id": 0,
-  "name": "string",
-  "tag": "string"
+  "code": "500",
+  "message": "Internal application error"
 }
 ```
 
@@ -187,7 +91,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[EstimatorDetail](#schemaestimatordetail)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -207,7 +111,18 @@ This operation does not require authentication
 > 200 Response
 
 ```json
-0
+{
+  "threads": 8
+}
+```
+
+> default Response
+
+```json
+{
+  "code": "500",
+  "message": "Internal application error"
+}
 ```
 
 <h3 id="get-estimator-threads-responses">Responses</h3>
@@ -232,7 +147,9 @@ This operation does not require authentication
 > Body parameter
 
 ```json
-0
+{
+  "threads": 12
+}
 ```
 
 <h3 id="update-estimator-threads-parameters">Parameters</h3>
@@ -282,11 +199,17 @@ This operation does not require authentication
 [
   {
     "node-id": "string",
+    "timeslot": 0,
     "tags": [
       "string"
     ],
     "tracked": true,
-    "use-case": "string"
+    "use-case": [
+      {
+        "id": "string",
+        "status": "BaU"
+      }
+    ]
   }
 ]
 ```
@@ -295,7 +218,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeList](#schemanodelist)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeStatusList](#schemanodestatuslist)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -319,7 +242,9 @@ This operation does not require authentication
     "string"
   ],
   "tracked": true,
-  "use-case": "string"
+  "use-case": [
+    "string"
+  ]
 }
 ```
 
@@ -327,7 +252,82 @@ This operation does not require authentication
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|body|body|[Node](#schemanode)|true|Optional description in *Markdown*|
+|body|body|[NodeConfig](#schemanodeconfig)|true|Optional description in *Markdown*|
+
+> Example responses
+
+> default Response
+
+```json
+{
+  "code": "500",
+  "message": "Internal application error"
+}
+```
+
+<h3 id="manage-new-node-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
+|default|Default|unexpected error|[Error](#schemaerror)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## delete all use ndoes
+
+<a id="opIddelete all use ndoes"></a>
+
+`DELETE /nodes`
+
+*Remove all nodes from the list of managed nodes*
+
+> Example responses
+
+> default Response
+
+```json
+{
+  "code": "500",
+  "message": "Internal application error"
+}
+```
+
+<h3 id="delete-all-use-ndoes-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
+|default|Default|unexpected error|[Error](#schemaerror)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## filter nodes by status
+
+<a id="opIdfilter nodes by status"></a>
+
+`GET /nodes/status`
+
+*Get list of nodes having the given status*
+
+<h3 id="filter-nodes-by-status-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|status|query|[Status](#schemastatus)|true|none|
+
+#### Enumerated Values
+
+|Parameter|Value|
+|---|---|
+|status|BaU|
+|status|Warn|
+|status|Alarm|
+|status|Undefined|
 
 > Example responses
 
@@ -337,21 +337,56 @@ This operation does not require authentication
 [
   {
     "node-id": "string",
+    "timeslot": 0,
     "tags": [
       "string"
     ],
     "tracked": true,
-    "use-case": "string"
+    "use-case": [
+      {
+        "id": "string",
+        "status": "BaU"
+      }
+    ]
   }
 ]
 ```
 
-<h3 id="manage-new-node-responses">Responses</h3>
+<h3 id="filter-nodes-by-status-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeList](#schemanodelist)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeStatusList](#schemanodestatuslist)|
 |default|Default|unexpected error|[Error](#schemaerror)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## get summarized status
+
+<a id="opIdget summarized status"></a>
+
+`GET /nodes/summarizedstatus`
+
+*Return the worst status across all nodes and use-cases*
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "timeslot": 0,
+  "status": "BaU"
+}
+```
+
+<h3 id="get-summarized-status-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodesSummarizedStatus](#schemanodessummarizedstatus)|
 
 <aside class="success">
 This operation does not require authentication
@@ -378,11 +413,17 @@ This operation does not require authentication
 ```json
 {
   "node-id": "string",
+  "timeslot": 0,
   "tags": [
     "string"
   ],
   "tracked": true,
-  "use-case": "string"
+  "use-case": [
+    {
+      "id": "string",
+      "status": "BaU"
+    }
+  ]
 }
 ```
 
@@ -390,7 +431,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeStatus](#schemanodestatus)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -414,7 +455,9 @@ This operation does not require authentication
     "string"
   ],
   "tracked": true,
-  "use-case": "string"
+  "use-case": [
+    "string"
+  ]
 }
 ```
 
@@ -423,20 +466,16 @@ This operation does not require authentication
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |Id|path|string|true|The id of the node to update|
-|body|body|[Node](#schemanode)|true|Optional description in *Markdown*|
+|body|body|[NodeConfig](#schemanodeconfig)|true|Optional description in *Markdown*|
 
 > Example responses
 
-> 200 Response
+> default Response
 
 ```json
 {
-  "node-id": "string",
-  "tags": [
-    "string"
-  ],
-  "tracked": true,
-  "use-case": "string"
+  "code": "500",
+  "message": "Internal application error"
 }
 ```
 
@@ -444,7 +483,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -467,16 +506,12 @@ This operation does not require authentication
 
 > Example responses
 
-> 200 Response
+> default Response
 
 ```json
 {
-  "node-id": "string",
-  "tags": [
-    "string"
-  ],
-  "tracked": true,
-  "use-case": "string"
+  "code": "500",
+  "message": "Internal application error"
 }
 ```
 
@@ -484,7 +519,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -514,26 +549,20 @@ true
 
 > Example responses
 
-> 200 Response
+> default Response
 
 ```json
-[
-  {
-    "node-id": "string",
-    "tags": [
-      "string"
-    ],
-    "tracked": true,
-    "use-case": "string"
-  }
-]
+{
+  "code": "500",
+  "message": "Internal application error"
+}
 ```
 
 <h3 id="ignore-a-node-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeList](#schemanodelist)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -557,12 +586,20 @@ This operation does not require authentication
 ```json
 [
   {
-    "node-id": "string",
+    "uc-id": "string",
     "tags": [
       "string"
     ],
-    "tracked": true,
-    "use-case": "string"
+    "adaptation": "string",
+    "bau": {
+      "samples": 0,
+      "threshold": 0,
+      "threshold-type": "string"
+    },
+    "warning": {
+      "samples": 0,
+      "hysteresis": "string"
+    }
   }
 ]
 ```
@@ -571,7 +608,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeList](#schemanodelist)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCaseList](#schemausecaselist)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -590,12 +627,20 @@ This operation does not require authentication
 
 ```json
 {
-  "node-id": "string",
+  "uc-id": "string",
   "tags": [
     "string"
   ],
-  "tracked": true,
-  "use-case": "string"
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
 }
 ```
 
@@ -603,30 +648,78 @@ This operation does not require authentication
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|body|body|[Node](#schemanode)|true|Optional description in *Markdown*|
+|body|body|[UseCase](#schemausecase)|true|Optional description in *Markdown*|
 
 > Example responses
 
 > 200 Response
 
 ```json
-[
-  {
-    "node-id": "string",
-    "tags": [
-      "string"
-    ],
-    "tracked": true,
-    "use-case": "string"
+{
+  "uc-id": "string",
+  "tags": [
+    "string"
+  ],
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
   }
-]
+}
 ```
 
 <h3 id="manage-a-new-use-case-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[NodeList](#schemanodelist)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCase](#schemausecase)|
+|default|Default|unexpected error|[Error](#schemaerror)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## delete all use cases
+
+<a id="opIddelete all use cases"></a>
+
+`DELETE /use-cases`
+
+*Remove all use-cases from the managed use-cases*
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "uc-id": "string",
+  "tags": [
+    "string"
+  ],
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
+}
+```
+
+<h3 id="delete-all-use-cases-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCase](#schemausecase)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -653,12 +746,20 @@ This operation does not require authentication
 
 ```json
 {
-  "node-id": "string",
+  "uc-id": "string",
   "tags": [
     "string"
   ],
-  "tracked": true,
-  "use-case": "string"
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
 }
 ```
 
@@ -666,7 +767,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCase](#schemausecase)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -685,12 +786,20 @@ This operation does not require authentication
 
 ```json
 {
-  "node-id": "string",
+  "uc-id": "string",
   "tags": [
     "string"
   ],
-  "tracked": true,
-  "use-case": "string"
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
 }
 ```
 
@@ -699,7 +808,7 @@ This operation does not require authentication
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |Id|path|string|true|The id of the use-case to update|
-|body|body|[Node](#schemanode)|true|Optional description in *Markdown*|
+|body|body|[UseCase](#schemausecase)|true|Optional description in *Markdown*|
 
 > Example responses
 
@@ -707,12 +816,20 @@ This operation does not require authentication
 
 ```json
 {
-  "node-id": "string",
+  "uc-id": "string",
   "tags": [
     "string"
   ],
-  "tracked": true,
-  "use-case": "string"
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
 }
 ```
 
@@ -720,16 +837,16 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCase](#schemausecase)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
 This operation does not require authentication
 </aside>
 
-## delete use-case
+## delete use case
 
-<a id="opIddelete use-case"></a>
+<a id="opIddelete use case"></a>
 
 `DELETE /use-cases/{Id}`
 
@@ -747,12 +864,20 @@ This operation does not require authentication
 
 ```json
 {
-  "node-id": "string",
+  "uc-id": "string",
   "tags": [
     "string"
   ],
-  "tracked": true,
-  "use-case": "string"
+  "adaptation": "string",
+  "bau": {
+    "samples": 0,
+    "threshold": 0,
+    "threshold-type": "string"
+  },
+  "warning": {
+    "samples": 0,
+    "hysteresis": "string"
+  }
 }
 ```
 
@@ -760,7 +885,7 @@ This operation does not require authentication
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[UseCase](#schemausecase)|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -775,7 +900,7 @@ This operation does not require authentication
 
 `GET /history`
 
-*Return history of all nodes currently managed*
+*Return history for all use-case currently managed*
 
 > Example responses
 
@@ -802,47 +927,13 @@ This operation does not require authentication
 
 `GET /history/{Id}`
 
-*Return history for the given node Id*
+*Return history for the given use-case Id*
 
 <h3 id="get-history-by-id-parameters">Parameters</h3>
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|Id|path|string|true|The id of the node to retrieve|
-
-> Example responses
-
-> 200 Response
-
-```json
-{
-  "node-id": "string",
-  "tags": [
-    "string"
-  ],
-  "tracked": true,
-  "use-case": "string"
-}
-```
-
-<h3 id="get-history-by-id-responses">Responses</h3>
-
-|Status|Meaning|Description|Schema|
-|---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
-|default|Default|unexpected error|[Error](#schemaerror)|
-
-<aside class="success">
-This operation does not require authentication
-</aside>
-
-## realign history for all nodes
-
-<a id="opIdrealign history for all nodes"></a>
-
-`POST /history/realign`
-
-*Reread history from input data, adapt and store them in local history for all nodes*
+|Id|path|string|true|The id of the use-case to retrieve|
 
 > Example responses
 
@@ -852,7 +943,7 @@ This operation does not require authentication
 "string"
 ```
 
-<h3 id="realign-history-for-all-nodes-responses">Responses</h3>
+<h3 id="get-history-by-id-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
@@ -863,40 +954,63 @@ This operation does not require authentication
 This operation does not require authentication
 </aside>
 
-## realing history for node id
+## realign history for all use-cases
 
-<a id="opIdrealing history for node id"></a>
+<a id="opIdrealign history for all use-cases"></a>
 
-`GET /history/realign/{Id}`
+`POST /history/realign`
 
-*Reread history from input data, adapt and store them in local history for a given node Id*
-
-<h3 id="realing-history-for-node-id-parameters">Parameters</h3>
-
-|Name|In|Type|Required|Description|
-|---|---|---|---|---|
-|Id|path|string|true|The Id of the node to realign history|
+*Reread history from input data, adapt and store them in local history for all use-cases*
 
 > Example responses
 
 > 200 Response
 
 ```json
-{
-  "node-id": "string",
-  "tags": [
-    "string"
-  ],
-  "tracked": true,
-  "use-case": "string"
-}
+"string"
 ```
 
-<h3 id="realing-history-for-node-id-responses">Responses</h3>
+<h3 id="realign-history-for-all-use-cases-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
-|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|[Node](#schemanode)|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|string|
+|default|Default|unexpected error|[Error](#schemaerror)|
+
+<aside class="success">
+This operation does not require authentication
+</aside>
+
+## realign history for use-case id
+
+<a id="opIdrealign history for use-case id"></a>
+
+`POST /history/realign/{Id}`
+
+*Reread history from input data, adapt and store them in local history for a given use-case Id*
+
+<h3 id="realign-history-for-use-case-id-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|Id|path|string|true|The Id of the use-case to realign history|
+
+> Example responses
+
+> default Response
+
+```json
+{
+  "code": "500",
+  "message": "Internal application error"
+}
+```
+
+<h3 id="realign-history-for-use-case-id-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Expected response to a valid request|None|
 |default|Default|unexpected error|[Error](#schemaerror)|
 
 <aside class="success">
@@ -1014,9 +1128,12 @@ This operation does not require authentication
 
 # Schemas
 
-<h2 id="tocSestimatordetail">EstimatorDetail</h2>
-
+<h2 id="tocS_EstimatorDetail">EstimatorDetail</h2>
+<!-- backwards compatibility -->
 <a id="schemaestimatordetail"></a>
+<a id="schema_EstimatorDetail"></a>
+<a id="tocSestimatordetail"></a>
+<a id="tocsestimatordetail"></a>
 
 ```json
 {
@@ -1035,40 +1152,28 @@ This operation does not require authentication
 |name|string|false|none|none|
 |tag|string|false|none|none|
 
-<h2 id="tocSestimatordetaillist">EstimatorDetailList</h2>
-
-<a id="schemaestimatordetaillist"></a>
-
-```json
-[
-  {
-    "id": 0,
-    "name": "string",
-    "tag": "string"
-  }
-]
-
-```
-
-### Properties
-
-|Name|Type|Required|Restrictions|Description|
-|---|---|---|---|---|
-|*anonymous*|[[EstimatorDetail](#schemaestimatordetail)]|false|none|none|
-
-<h2 id="tocSnodelist">NodeList</h2>
-
-<a id="schemanodelist"></a>
+<h2 id="tocS_NodeStatusList">NodeStatusList</h2>
+<!-- backwards compatibility -->
+<a id="schemanodestatuslist"></a>
+<a id="schema_NodeStatusList"></a>
+<a id="tocSnodestatuslist"></a>
+<a id="tocsnodestatuslist"></a>
 
 ```json
 [
   {
     "node-id": "string",
+    "timeslot": 0,
     "tags": [
       "string"
     ],
     "tracked": true,
-    "use-case": "string"
+    "use-case": [
+      {
+        "id": "string",
+        "status": "BaU"
+      }
+    ]
   }
 ]
 
@@ -1078,11 +1183,51 @@ This operation does not require authentication
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|*anonymous*|[[Node](#schemanode)]|false|none|none|
+|*anonymous*|[[NodeStatus](#schemanodestatus)]|false|none|none|
 
-<h2 id="tocSnode">Node</h2>
+<h2 id="tocS_NodeStatus">NodeStatus</h2>
+<!-- backwards compatibility -->
+<a id="schemanodestatus"></a>
+<a id="schema_NodeStatus"></a>
+<a id="tocSnodestatus"></a>
+<a id="tocsnodestatus"></a>
 
-<a id="schemanode"></a>
+```json
+{
+  "node-id": "string",
+  "timeslot": 0,
+  "tags": [
+    "string"
+  ],
+  "tracked": true,
+  "use-case": [
+    {
+      "id": "string",
+      "status": "BaU"
+    }
+  ]
+}
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|node-id|string|true|none|none|
+|timeslot|integer(int32)|false|none|none|
+|tags|[string]|false|none|none|
+|tracked|boolean|false|none|none|
+|use-case|[object]|false|none|none|
+|» id|string|false|none|none|
+|» status|[Status](#schemastatus)|false|none|none|
+
+<h2 id="tocS_NodeConfig">NodeConfig</h2>
+<!-- backwards compatibility -->
+<a id="schemanodeconfig"></a>
+<a id="schema_NodeConfig"></a>
+<a id="tocSnodeconfig"></a>
+<a id="tocsnodeconfig"></a>
 
 ```json
 {
@@ -1091,7 +1236,9 @@ This operation does not require authentication
     "string"
   ],
   "tracked": true,
-  "use-case": "string"
+  "use-case": [
+    "string"
+  ]
 }
 
 ```
@@ -1103,11 +1250,14 @@ This operation does not require authentication
 |node-id|string|true|none|none|
 |tags|[string]|false|none|none|
 |tracked|boolean|false|none|none|
-|use-case|string|false|none|none|
+|use-case|[string]|false|none|none|
 
-<h2 id="tocSusecaselist">UseCaseList</h2>
-
+<h2 id="tocS_UseCaseList">UseCaseList</h2>
+<!-- backwards compatibility -->
 <a id="schemausecaselist"></a>
+<a id="schema_UseCaseList"></a>
+<a id="tocSusecaselist"></a>
+<a id="tocsusecaselist"></a>
 
 ```json
 [
@@ -1137,9 +1287,12 @@ This operation does not require authentication
 |---|---|---|---|---|
 |*anonymous*|[[UseCase](#schemausecase)]|false|none|none|
 
-<h2 id="tocSusecase">UseCase</h2>
-
+<h2 id="tocS_UseCase">UseCase</h2>
+<!-- backwards compatibility -->
 <a id="schemausecase"></a>
+<a id="schema_UseCase"></a>
+<a id="tocSusecase"></a>
+<a id="tocsusecase"></a>
 
 ```json
 {
@@ -1176,9 +1329,12 @@ This operation does not require authentication
 |» samples|integer(int32)|false|none|none|
 |» hysteresis|string|false|none|none|
 
-<h2 id="tocSestimatorsummary">EstimatorSummary</h2>
-
-<a id="schemaestimatorsummary"></a>
+<h2 id="tocS_NodesSummarizedStatus">NodesSummarizedStatus</h2>
+<!-- backwards compatibility -->
+<a id="schemanodessummarizedstatus"></a>
+<a id="schema_NodesSummarizedStatus"></a>
+<a id="tocSnodessummarizedstatus"></a>
+<a id="tocsnodessummarizedstatus"></a>
 
 ```json
 {
@@ -1193,20 +1349,14 @@ This operation does not require authentication
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |timeslot|integer(int64)|false|none|none|
-|status|string|false|none|none|
+|status|[Status](#schemastatus)|false|none|none|
 
-#### Enumerated Values
-
-|Property|Value|
-|---|---|
-|status|BaU|
-|status|Warn|
-|status|Alarm|
-|status|Undefined|
-
-<h2 id="tocSarimaparameters">ArimaParameters</h2>
-
+<h2 id="tocS_ArimaParameters">ArimaParameters</h2>
+<!-- backwards compatibility -->
 <a id="schemaarimaparameters"></a>
+<a id="schema_ArimaParameters"></a>
+<a id="tocSarimaparameters"></a>
+<a id="tocsarimaparameters"></a>
 
 ```json
 {
@@ -1225,14 +1375,44 @@ This operation does not require authentication
 |D|integer(int64)|false|none|none|
 |Q|integer(int64)|false|none|none|
 
-<h2 id="tocSerror">Error</h2>
+<h2 id="tocS_Status">Status</h2>
+<!-- backwards compatibility -->
+<a id="schemastatus"></a>
+<a id="schema_Status"></a>
+<a id="tocSstatus"></a>
+<a id="tocsstatus"></a>
 
+```json
+"BaU"
+
+```
+
+### Properties
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|*anonymous*|string|false|none|none|
+
+#### Enumerated Values
+
+|Property|Value|
+|---|---|
+|*anonymous*|BaU|
+|*anonymous*|Warn|
+|*anonymous*|Alarm|
+|*anonymous*|Undefined|
+
+<h2 id="tocS_Error">Error</h2>
+<!-- backwards compatibility -->
 <a id="schemaerror"></a>
+<a id="schema_Error"></a>
+<a id="tocSerror"></a>
+<a id="tocserror"></a>
 
 ```json
 {
-  "code": 0,
-  "message": "string"
+  "code": "500",
+  "message": "Internal application error"
 }
 
 ```
