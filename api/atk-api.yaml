@@ -1,117 +1,26 @@
 openapi: "3.0.0"
 info:
-  version: 1.0.0
+  version: 2.0.0
   title: Analytic Toolkit REST API
   license:
     name: Apache License 2.0
 servers:
   - url: http://localhost:8080/v1
+tags:
+  - name: nodes
+    description: create/read/update/delete operations on nodes
+  - name: use-cases
+    description: create/read/update/delete operations on use-cases
+  - name: status
+    description: estimator status including correlations
+  - name: estimator
+    description: low-level operations on the estimators settings defined for a given use-case, node and probe
+  - name: history
+    description: low-level operations on the estimators forecast history
 paths:
-  /estimator/params:
-    get:
-      summary: Get the ARIMA parameters used by the estimators
-      operationId: get estimator parameters
-      tags:
-        - estimator
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ArimaParameters"
-              example:
-                P: 5
-                D: 1
-                Q: 0
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      summary: Update the ARIMA parameters used by the estimators
-      operationId: update estimator parameters
-      tags:
-        - estimator
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ArimaParameters'
-            example:
-                P: 1
-                D: 0
-                Q: 12
-      responses:
-        '200':
-          description: Expected response to a valid request
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /estimator/threads:
-    get:
-      summary: Get the number of threads used by ARIMA estimators
-      operationId: get estimator threads
-      tags:
-        - estimator
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                type: integer
-                format: int32
-                minimum: 1
-                maximum: 1024
-              example:
-                threads: 8
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      summary: Update the number of threads used by ARIMA estimators
-      operationId: update estimator threads
-      tags:
-        - estimator
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              type: integer
-              format: int32
-              minimum: 1
-              maximum: 1024
-              example:
-                threads: 12
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EstimatorDetail"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
   /nodes:
     get:
-      summary: Return list of nodes currently managed
+      summary: Return list of all nodes currently managed
       operationId: get all nodes
       tags:
         - nodes
@@ -121,39 +30,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeStatusList"
+                $ref: "#/components/schemas/NodeConfigList"
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Manage a new node
+      summary: Manage a new node identified by a new {id}
       operationId: manage new node
       tags:
         - nodes
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/NodeConfig'
-            example:
-              node-id: "VNF-x"
-              tracked: true
-              use-case:
-                - "UC-y"
-                - "UC-z"
-              tags:
-                - pce
-                - sdd
       responses:
         '200':
           description: Expected response to a valid request
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
@@ -167,60 +68,22 @@ paths:
         '200':
           description: Expected response to a valid request
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /nodes/status:
+  /nodes/{id}:
     get:
-      parameters:
-        - in: query
-          name: status
-          schema:
-            $ref: '#/components/schemas/Status'
-          required: true
-      summary: Get list of nodes having the given status 
-      operationId: filter nodes by status
-      tags:
-        - nodes
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NodeStatusList"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /nodes/summarizedstatus:
-    get:
-      summary: Return the worst status across all nodes and use-cases
-      operationId: get summarized status
-      tags:
-        - nodes
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NodesSummarizedStatus"
-  /nodes/{Id}:
-    get:
-      summary: Detailed information for a specific node
+      summary: Detailed information for a specific node {id}
       operationId: get node by id
       tags:
         - nodes
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
-          description: The id of the node to retrieve
+          description: The name of the node to retrieve
           schema:
             type: string
       responses:
@@ -229,27 +92,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NodeStatus"
+                $ref: "#/components/schemas/NodeConfig"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    put:
-      summary: Update information for a specific node {Id}
-      operationId: update node by id
+    post:
+      summary: Update information for a given node {id}
+      operationId: update node by name
       tags:
         - nodes
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
           description: The id of the node to update
           schema:
             type: string
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
@@ -258,58 +122,33 @@ paths:
       responses:
         '200':
           description: Expected response to a valid request
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Remove node {id} from the managed nodes
+      summary: Remove node by its {id} from the managed nodes
       operationId: delete node by id
       tags:
         - nodes
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
-          description: The id of the node to delete
+          description: The name of the node to delete
           schema:
             type: string
       responses:
         '200':
           description: Expected response to a valid request
+        '404':
+          description: Not found
         default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /nodes/{Id}/ignore:
-    post:
-      summary: If set to true, keep node {id} tracked but do not consider for the estimation.
-      operationId: ignore a node
-      tags:
-        - nodes
-      parameters:
-        - name: Id
-          in: path
-          required: true
-          description: The id of the node
-          schema:
-            type: string
-      requestBody:
-        description: Optional description in *Markdown*
-        required: true
-        content:
-          application/json:
-            schema:
-              type: boolean
-      responses:
-        '200':
-          description: Expected response to a valid request
-        default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
@@ -328,18 +167,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/UseCaseList"
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
+                $ref: "#/components/schemas/Error"
     post:
-      summary: Manage a new use-case
+      summary: Manage a new use-case identified by a new {id}
       operationId: manage a new use-case
       tags:
         - use-cases
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
@@ -352,12 +190,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UseCase"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Remove all use-cases from the managed use-cases
       operationId: delete all use cases
@@ -371,19 +211,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/UseCase"
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /use-cases/{Id}:
+  /use-cases/{id}:
     get:
-      summary: Detailed information for a specific use-case
-      operationId: get use-case by id
+      summary: Detailed information for a specific use-case by {id}
+      operationId: get use-case by name
       tags:
         - use-cases
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
           description: The id of the use-case to retrieve
@@ -396,26 +236,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UseCase"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    put:
-      summary: Update information for a specific use-case {Id}
+    post:
+      summary: Update information for a specific use-case by {id}
       operationId: update use-case
       tags:
         - use-cases
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
           description: The id of the use-case to update
           schema:
             type: string
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
@@ -428,19 +269,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UseCase"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Remove use-case {id} from the managed use-cases
+      summary: Remove use-case by {id} from the managed use-cases
       operationId: delete use case
       tags:
         - use-cases
       parameters:
-        - name: Id
+        - name: id
           in: path
           required: true
           description: The id of the use-case to delete
@@ -453,42 +296,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UseCase"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /history:
+  /status:
     get:
-      summary: Return history for all use-case currently managed
-      operationId: get history
+      summary: get the estimator status, including correlations
+      operationId: get status
       tags:
-        - history
+        - status
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/FullStatus"
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
-  /history/{Id}:
+                $ref: "#/components/schemas/Error"
+  /estimator/hysteresis:
     get:
-      summary: Return history for the given use-case Id
-      operationId: get history by id
+      summary: Get the hysteresis between WARN and ALARM
+      operationId: get hysteresis
       tags:
-        - history
+        - estimator
       parameters:
-        - name: Id
-          in: path
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
           required: true
-          description: The id of the use-case to retrieve
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
           schema:
             type: string
       responses:
@@ -497,170 +357,567 @@ paths:
           content:
             application/json:
               schema:
-                type: "string"
+                $ref: "#/components/schemas/EstimatorHysteresisState"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /history/realign:
     post:
-      summary: Reread history from input data, adapt and store them in local history for all use-cases
-      operationId: realign history for all use-cases
+      summary: Set the hysteresis between WARN and STATUS
+      operationId: set hysteresis
       tags:
-        - history
+        - estimator
+      requestBody:
+        description: The use-case and node.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EstimatorHysteresisConfig"
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                type: "string"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
-  /history/realign/{Id}:
-    post:
-      summary: Reread history from input data, adapt and store them in local history for a given use-case Id
-      operationId: realign history for use-case id
+                $ref: "#/components/schemas/Error"
+  /estimator/params:
+    get:
+      summary: Get the ARIMA parameters
+      operationId: get estimator parameters
       tags:
-        - history
+        - estimator
       parameters:
-        - name: Id
-          in: path
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
           required: true
-          description: The Id of the use-case to realign history
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: forecast-1
+          required: true
           schema:
             type: string
       responses:
         '200':
           description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArimaParametersState"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /history/ts-min:
+    post:
+      summary: Update the ARIMA parameters
+      operationId: update estimator parameters
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArimaParametersConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/forecast-threshold:
     get:
-      summary: Return minimum number of timeslots to populate local history
-      operationId: get minimum timeslots
+      summary: Get the forecast threshold
+      operationId: get forecast threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: forecast-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThresholdValueState'
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the forecast threshold
+      operationId: set forecast threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThresholdValueConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/detection-threshold:
+    get:
+      summary: Get the detection threshold
+      operationId: get detection threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ThresholdValueState"
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the detection threshold
+      operationId: Set detection threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ThresholdValueConfig"
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/area-detection-percentage:
+    get:
+      summary: Get the relative per-area detection threshold
+      operationId: get relative per-area detection threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PercentageState'
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the relative per-area detection threshold
+      operationId: set relative per-area detection threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PercentageConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/type-detection-percentage:
+    get:
+      summary: Get the relative per-type detection threshold
+      operationId: get relative per-type detection threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PercentageState'
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the relative per-type detection threshold
+      operationId: set relative per-type detection threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PercentageConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/area-correlation-percentage:
+    get:
+      summary: Get the relative per-area correlation threshold
+      operationId: get relative per-area correlation threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PercentageState'
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the relative per-area correlation threshold
+      operationId: set relative per-area correlation threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PercentageConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /estimator/type-correlation-percentage:
+    get:
+      summary: Get the relative per-type correlation threshold
+      operationId: get relative per-type correlation threshold
+      tags:
+        - estimator
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PercentageState'
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Set the relative per-area correlation threshold
+      operationId: Set relative per-area correlation threshold
+      tags:
+        - estimator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PercentageConfig'
+      responses:
+        '200':
+          description: Expected response to a valid request
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /history/:
+    get:
+      summary: Return estimator forecast history for the given use-case, node and probe
+      operationId: get history by use-case, node and probe
       tags:
         - history
+      parameters:
+        - in: query
+          name: use-case
+          description: use-case identifier
+          example: NTP
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: node
+          description: node identifier
+          example: Genoa-2
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: probe
+          description: probe identifier
+          example: detection-1
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                type: integer
-                format: int32
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryPoint"
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
-  /history/ts-max:
-    get:
-      summary: Return maximum number of timeslots to populate local history
-      operationId: get maximum timeslots
+                $ref: "#/components/schemas/Error"
+  /history/realign/:
+    post:
+      summary: Realign the forecast history for the given use-case, node and probe
+      operationId: realign one estimator history
       tags:
         - history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UNP-identifier'
       responses:
         '200':
           description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                type: integer
-                format: int32
+        '404':
+          description: Not found
         default:
-          description: unexpected error
+          description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"              
-  /history/autorefresh:
-    get:
-      summary: Return the time interval between consecutive data captures
-      operationId: get autorefresh
-      tags:
-        - history
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                type: integer
-                format: int32
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"              
-  /version:
-    get:
-      summary: Return the ATk software version
-      operationId: get version
-      tags:
-        - version
-      responses:
-        '200':
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                type: "string"
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
-    EstimatorDetail:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        tag:
-          type: string
-    NodeStatusList:
+    NodeConfigList:
       type: array
       items:
-        $ref: '#/components/schemas/NodeStatus'
-    NodeStatus:
-      type: object
-      required:
-        - node-id
-      properties:
-        node-id:
-          type: string
-        timeslot:
-          type: integer
-          format: int32
-        tags:
-          type: array
-          items:
-            type: string
-        tracked:
-          type: boolean
-        use-case:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              status:
-                $ref: '#/components/schemas/Status'
+        $ref: '#/components/schemas/NodeConfig'
     NodeConfig:
       type: object
       required:
@@ -668,16 +925,18 @@ components:
       properties:
         node-id:
           type: string
-        tags:
-          type: array
-          items:
-            type: string
-        tracked:
-          type: boolean
+          example: Genoa-Erzelli
+        area:
+          type: string
+          example: Genoa
+        type:
+          type: string
+          example: NTP
         use-case:
           type: array
           items:
-            type: string      
+            type: string
+          example: [ NTP1, NTP2 ]
     UseCaseList:
       type: array
       items:
@@ -689,54 +948,197 @@ components:
       properties:
         uc-id:
           type: string
-        tags:
+          example: NTP
+        forecast-parameters:
           type: array
           items:
-            type: string
-        adaptation:
-          type: string
-        bau:
-          type: object
+            $ref: "#/components/schemas/ForecastParameter"
+          minItems: 1
+          maxItems: 4
+        detection-parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectionParameter"
+          minItems: 1
+          maxItems: 4
+    ForecastParameter:
+      description: "A parameter used for forecast and its threshold"
+      allOf:
+        - type: object
           properties:
-            samples:
-              type: integer
-              format: int32
-            threshold:
-              type: integer
-              format: int32
-            threshold-type:
+            id:
               type: string
-        warning:
-          type: object
-          properties:
-            samples:
-              type: integer
-              format: int32
-            hysteresis:
-              type: string
-    NodesSummarizedStatus:
+              example: NTP_volume
+              description: Unique identifier of each parameter
+        - $ref: "#/components/schemas/ThresholdValueState"
+    ThresholdValueState:
       type: object
       properties:
-        timeslot:
-          type: "integer"
-          format: int64
-        status:
-          $ref: "#/components/schemas/Status"
-    ArimaParameters:
+        threshold:
+          format: int32
+          minimum: 0
+          example: 474
+          description: Absolute value of a threshold
+    ThresholdValueConfig:
+      allOf:
+        - $ref: '#/components/schemas/ThresholdValueState'
+        - $ref: '#/components/schemas/UNP-identifier'
+    DetectionParameter:
+      description: >
+        A parameter used for detection and its threshold, the hysteresis
+        and its set of relative thresholds for correlation.
+        The "area-detection-percentage" is a percentage of the detection threshold
+        and is used to compute a, typically lower, per-area detection threshold.
+        For every area A, ATk looks for its nodes where the resulting per-area
+        detection threshold is exceeded. 
+        If the percentage of these nodes in an area A exceeds the "area-correlation-percentage",
+        then ATK decides status "WARN" for the area A, otherwise status "BAU".
+        Similarly, the "type-detection-percentage" is a percentage of the detection threshold
+        and is used to compute a, typically lower, per-type detection threshold.
+        For every node type T, ATk looks for nodes where the resulting per-type
+        detection threshold is exceeded. 
+        If the percentage of these nodes for a type T exceeds the "type-correlation-percentage",
+        then ATK decides status "WARN" for the type T, otherwise status "BAU".
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: NTP_monlist
+              description: Unique identifier of each parameter
+            area-detection-percentage:
+              $ref: '#/components/schemas/PercentageState'
+            type-detection-percentage:
+              $ref: '#/components/schemas/PercentageState'
+            area-correlation-percentage:
+              $ref: '#/components/schemas/PercentageState'
+            type-correlation-percentage:
+              $ref: '#/components/schemas/PercentageState'
+        - $ref: '#/components/schemas/ThresholdValueState'
+        - $ref: '#/components/schemas/EstimatorHysteresisState'
+    ArimaParametersState:
       type: object
       properties:
         P:
           type: "integer"
           format: int64
+          example: 5
         D:
           type: "integer"
           format: int64
+          example: 1
         Q:
           type: "integer"
           format: int64
+          example: 0     
+    ArimaParametersConfig:
+      allOf:
+        - $ref: '#/components/schemas/UNP-identifier'
+        - $ref: '#/components/schemas/ArimaParametersState'
+    UNP-identifier:
+      description: reusable model containing just use-case (U), node (N) and probe (P) identifier
+      type: object
+      properties:
+        use-case:
+          description: use-case identifier
+          type: string
+          example: NTP
+        node:
+          description: node identifier
+          type: string
+          example: Milan-3
+        probe:
+          description: probe identifier
+          type: string
+          example: probe-C
+    EstimatorHysteresisState:
+      description: The estimator waits for this number of time intervals before passing from WARN to ALARM state
+      type: object
+      properties:
+        histeresys:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 10
+          example: 3
+    EstimatorHysteresisConfig:
+      description: This is EstimatorHysteresisState decorated with use-case, node and probe information.
+      allOf:
+      - $ref: '#/components/schemas/EstimatorHysteresisState'
+      - $ref: '#/components/schemas/UNP-identifier'
     Status:
       type: "string"
-      enum: [BaU, Warn, Alarm, Undefined]
+      enum: [BAU, WARN, ALARM, UNDEFINED]
+      example: BAU
+    FullStatus:
+      type: object
+      description: return the status computed across all node types and areas, for each use-case.
+      properties:
+        time:
+          $ref: '#/components/schemas/Timestamp'
+        network-status:
+          $ref: "#/components/schemas/Status"
+        correlation-type-status:
+          type: array
+          items:
+            $ref: "#/components/schemas/CorrelationStatusByType"
+        correlation-area-status:
+          type: array
+          items:
+            $ref: "#/components/schemas/CorrelationStatusByArea"
+    CorrelationStatusByType:
+      type: object
+      description: correlationstatus computed across all node types
+      properties:
+        use-case:
+          type: string
+          example: "MITM"
+          description: use-case identifier
+        correlations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CorrelationStatusByTypeElement"
+    CorrelationStatusByArea:
+      type: object
+      description: correlationstatus computed across all areas
+      properties:
+        use-case:
+          type: string
+          example: "MITM"
+          description: use-case identifier
+        correlations:
+          type: array
+          items:
+            $ref: "#/components/schemas/CorrelationStatusByAreaElement"
+    CorrelationStatusByTypeElement:
+      type: object
+      properties:
+        node-type:
+          type: string
+          example: PE-Routers
+        value:
+          $ref: "#/components/schemas/Status"
+    CorrelationStatusByAreaElement:
+      type: object
+      properties:
+        area:
+          type: string
+          example: Turin
+        value:
+          $ref: "#/components/schemas/Status"
+    PercentageState:
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 100
+          example: 11
+    PercentageConfig:
+      allOf:
+        - $ref: '#/components/schemas/PercentageState'
+        - $ref: '#/components/schemas/UNP-identifier'
     Error:
       type: object
       required:
@@ -750,4 +1152,17 @@ components:
           type: string
       example:
         code: "500"
-        message: "Internal application error" 
+        message: "Internal application error"
+    HistoryPoint:
+      type: object
+      properties:
+        time:
+          $ref: '#/components/schemas/Timestamp'
+        value:
+          $ref: "#/components/schemas/Status"
+    Timestamp:
+      type: integer
+      format: int32
+      example: 1600034400
+      minimum: 0
+      description: seconds since epoch
