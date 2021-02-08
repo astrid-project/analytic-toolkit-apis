@@ -8,20 +8,20 @@ servers:
   - url: http://localhost:8080/v1
 tags:
   - name: nodes
-    description: create/read/update/delete operations on nodes
+    description: Create/read/update/delete operations on nodes
   - name: use-cases
-    description: create/read/update/delete operations on use-cases
+    description: Create/read/update/delete operations on use-cases
   - name: status
-    description: estimator status including correlations
+    description: Estimator status including correlations
   - name: estimator
-    description: low-level operations on the estimators settings defined for a given use-case, node and probe
+    description: Low-level operations on the estimators settings defined for a given use-case, node and probe
   - name: history
-    description: low-level operations on the estimators forecast history
+    description: Low-level operations on the estimators forecast history
 paths:
   /nodes:
     get:
       summary: Return list of all nodes currently managed
-      operationId: get all nodes
+      operationId: Get all nodes
       tags:
         - nodes
       responses:
@@ -38,8 +38,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Manage a new node identified by a new {id}
-      operationId: manage new node
+      summary: Manage a new node identified by a new id
+      operationId: Manage new node
       tags:
         - nodes
       requestBody:
@@ -61,7 +61,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Remove all nodes from the list of managed nodes
-      operationId: delete all use ndoes
+      operationId: Delete all ndoes
       tags:
         - nodes
       responses:
@@ -75,15 +75,15 @@ paths:
                 $ref: "#/components/schemas/Error"
   /nodes/{id}:
     get:
-      summary: Detailed information for a specific node {id}
-      operationId: get node by id
+      summary: Detailed information for a specific node id
+      operationId: Get node by id
       tags:
         - nodes
       parameters:
         - name: id
           in: path
           required: true
-          description: The name of the node to retrieve
+          description: The id of the node to retrieve
           schema:
             type: string
       responses:
@@ -102,8 +102,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Update information for a given node {id}
-      operationId: update node by name
+      summary: Update information for a given node id
+      operationId: Update node by id
       tags:
         - nodes
       parameters:
@@ -131,8 +131,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Remove node by its {id} from the managed nodes
-      operationId: delete node by id
+      summary: Remove node by its id from the managed nodes
+      operationId: Delete node by id
       tags:
         - nodes
       parameters:
@@ -156,7 +156,7 @@ paths:
   /use-cases:
     get:
       summary: Return list of use-cases currently managed
-      operationId: get all use-cases
+      operationId: Get all use-cases
       tags:
         - use-cases
       responses:
@@ -173,8 +173,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Manage a new use-case identified by a new {id}
-      operationId: manage a new use-case
+      summary: Manage a new use-case identified by a new id
+      operationId: Manage a new use-case
       tags:
         - use-cases
       requestBody:
@@ -200,7 +200,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     delete:
       summary: Remove all use-cases from the managed use-cases
-      operationId: delete all use cases
+      operationId: Delete all use cases
       tags:
         - use-cases
       responses:
@@ -218,8 +218,8 @@ paths:
                 $ref: "#/components/schemas/Error"
   /use-cases/{id}:
     get:
-      summary: Detailed information for a specific use-case by {id}
-      operationId: get use-case by name
+      summary: Detailed information for a specific use-case by id
+      operationId: Get use-case by name
       tags:
         - use-cases
       parameters:
@@ -245,8 +245,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
-      summary: Update information for a specific use-case by {id}
-      operationId: update use-case
+      summary: Update information for a specific use-case by id
+      operationId: Update use-case
       tags:
         - use-cases
       parameters:
@@ -278,8 +278,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Remove use-case by {id} from the managed use-cases
-      operationId: delete use case
+      summary: Remove use-case by id from the managed use-cases
+      operationId: Delete use case by id
       tags:
         - use-cases
       parameters:
@@ -306,8 +306,8 @@ paths:
                 $ref: "#/components/schemas/Error"
   /status:
     get:
-      summary: get the estimator status, including correlations
-      operationId: get status
+      summary: Get the estimator status, including correlations
+      operationId: Get status
       tags:
         - status
       responses:
@@ -326,7 +326,7 @@ paths:
   /estimator/hysteresis:
     get:
       summary: Get the hysteresis between WARN and ALARM
-      operationId: get hysteresis
+      operationId: Get hysteresis
       tags:
         - estimator
       parameters:
@@ -368,7 +368,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Set the hysteresis between WARN and STATUS
-      operationId: set hysteresis
+      operationId: Set hysteresis
       tags:
         - estimator
       requestBody:
@@ -392,7 +392,7 @@ paths:
   /estimator/params:
     get:
       summary: Get the ARIMA parameters
-      operationId: get estimator parameters
+      operationId: Get estimator parameters
       tags:
         - estimator
       parameters:
@@ -434,7 +434,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Update the ARIMA parameters
-      operationId: update estimator parameters
+      operationId: Update estimator parameters
       tags:
         - estimator
       requestBody:
@@ -457,7 +457,7 @@ paths:
   /estimator/forecast-threshold:
     get:
       summary: Get the forecast threshold
-      operationId: get forecast threshold
+      operationId: Get forecast threshold
       tags:
         - estimator
       parameters:
@@ -499,7 +499,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Set the forecast threshold
-      operationId: set forecast threshold
+      operationId: Set forecast threshold
       tags:
         - estimator
       requestBody:
@@ -522,7 +522,7 @@ paths:
   /estimator/detection-threshold:
     get:
       summary: Get the detection threshold
-      operationId: get detection threshold
+      operationId: Get detection threshold
       tags:
         - estimator
       parameters:
@@ -587,7 +587,7 @@ paths:
   /estimator/area-detection-percentage:
     get:
       summary: Get the relative per-area detection threshold
-      operationId: get relative per-area detection threshold
+      operationId: Get relative per-area detection threshold
       tags:
         - estimator
       parameters:
@@ -629,7 +629,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Set the relative per-area detection threshold
-      operationId: set relative per-area detection threshold
+      operationId: Set relative per-area detection threshold
       tags:
         - estimator
       requestBody:
@@ -652,7 +652,7 @@ paths:
   /estimator/type-detection-percentage:
     get:
       summary: Get the relative per-type detection threshold
-      operationId: get relative per-type detection threshold
+      operationId: Get relative per-type detection threshold
       tags:
         - estimator
       parameters:
@@ -694,7 +694,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Set the relative per-type detection threshold
-      operationId: set relative per-type detection threshold
+      operationId: Set relative per-type detection threshold
       tags:
         - estimator
       requestBody:
@@ -717,7 +717,7 @@ paths:
   /estimator/area-correlation-percentage:
     get:
       summary: Get the relative per-area correlation threshold
-      operationId: get relative per-area correlation threshold
+      operationId: Get relative per-area correlation threshold
       tags:
         - estimator
       parameters:
@@ -759,7 +759,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Set the relative per-area correlation threshold
-      operationId: set relative per-area correlation threshold
+      operationId: Set relative per-area correlation threshold
       tags:
         - estimator
       requestBody:
@@ -822,32 +822,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    post:
-      summary: Set the relative per-area correlation threshold
-      operationId: Set relative per-area correlation threshold
-      tags:
-        - estimator
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PercentageConfig'
-      responses:
-        '200':
-          description: Expected response to a valid request
-        '404':
-          description: Not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
   /history/:
     get:
       summary: Return estimator forecast history for the given use-case, node and probe
-      operationId: get history by use-case, node and probe
+      operationId: Get history by use-case, node and probe
       tags:
         - history
       parameters:
@@ -892,7 +870,7 @@ paths:
   /history/realign/:
     post:
       summary: Realign the forecast history for the given use-case, node and probe
-      operationId: realign one estimator history
+      operationId: Realign an estimator history
       tags:
         - history
       requestBody:
@@ -992,13 +970,13 @@ components:
         For every area A, ATk looks for its nodes where the resulting per-area
         detection threshold is exceeded. 
         If the percentage of these nodes in an area A exceeds the "area-correlation-percentage",
-        then ATK decides status "WARN" for the area A, otherwise status "BAU".
+        then ATk decides status "WARN" for the area A, otherwise status "BAU".
         Similarly, the "type-detection-percentage" is a percentage of the detection threshold
         and is used to compute a, typically lower, per-type detection threshold.
         For every node type T, ATk looks for nodes where the resulting per-type
         detection threshold is exceeded. 
         If the percentage of these nodes for a type T exceeds the "type-correlation-percentage",
-        then ATK decides status "WARN" for the type T, otherwise status "BAU".
+        then ATk decides status "WARN" for the type T, otherwise status "BAU".
       allOf:
         - type: object
           properties:
